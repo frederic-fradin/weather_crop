@@ -12,7 +12,7 @@ Past anomalies 7 day total :        https://www.worldagweather.com/pastwx/pastpc
 '''
 
 dict_refid = {
-    'temp_gefs_day7':[2440, '2024-08-18'],
+    'tmp_gefs_day7':[2440, '2024-08-18'],
     'pcp_gfs_day7':[2441, '2024-08-18'],
     'pastpcp_in_7day':[4433, '2024-08-16'],
     }
@@ -39,6 +39,13 @@ def load_places() -> list:
     
     return list_place
 
+def load_analysis() -> list:
+    list_analysis = []
+    for key, value in dict_refid.items():
+        list_analysis.append(key)
+    
+    return list_analysis
+
 def calculate_id_date(select_date:str, type:str) -> int:
     piv_id = dict_refid[type][0]
     piv_date = datetime.strptime(dict_refid[type][1], "%Y-%m-%d")
@@ -52,13 +59,20 @@ def calculate_id_date(select_date:str, type:str) -> int:
 
     return int(sel_id)
 
-def load_temp_anomaly(select_date:str, place:str) -> object:
-    id_date = calculate_id_date(select_date, type='temp_gefs_day7')
+def load_GFS_analysis(select_date:str, place:str) -> object:
     id_place = dict_place[place]
-    url = f'https://www.worldagweather.com/fcstwx/tmp_gefs_day7_{id_place}_metric_{id_date}.png'
 
-    return url
+    id1 = calculate_id_date(select_date, type='tmp_gefs_day7')
+    url1 = f'https://www.worldagweather.com/fcstwx/tmp_gefs_day7_{id_place}_metric_{id1}.png'
+
+    id2 = calculate_id_date(select_date, type='pcp_gfs_day7')
+    url2 = f'https://www.worldagweather.com/fcstwx/pcp_gfs_day7_{id_place}_metric_{id2}.png'
+
+    id3 = calculate_id_date(select_date, type='pastpcp_in_7day') - 2
+    url3 = f'https://www.worldagweather.com/pastwx/pastpcp_{id_place}_7day_metric_{id3}.png'
+
+    return url3, url2, url1
 
 
 if __name__ == '__main__':
-    load_temp_anomaly(select_date='2024-08-16', place='Europe')
+    load_GFS_analysis(select_date='2024-08-16', place='Europe')
