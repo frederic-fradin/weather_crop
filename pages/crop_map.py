@@ -43,19 +43,20 @@ with tab1:
         select = select[(select['REGION'].isin(sel_region)) & (select['PRODUCTION'].isin(sel_product))].copy()
         
         def color_vowel(value):
-            color = (f"background-color: #6B8C4A; color: #2E4022" if value in [*"P"]
-                     else f"background-color: #D9B343; color: #8C7F3E;" if value in [*"H"]
+            color = (f"background-color: #6B8C4A; color: #2E4022" if value in ["PLA"]
+                     else f"background-color: #D9B343; color: #8C7F3E;" if value in ["HAR"]
                      else None)
             return color
         
         select_df = select.drop(columns=['REGION'])
         list_col = select_df.columns.to_list()
-        col1.write('Source USDA : (P) Plant - (H) Harvest')
-        col1.dataframe(select_df.style.applymap(color_vowel, subset=list_col),
+        col1.write('Source USDA : (PLA) Plant - (HAR) Harvest - (FLO) Flowering')
+        col1.dataframe(select_df.style.map(color_vowel, subset=list_col),
                        hide_index=True, use_container_width=True)
         
         short_month = sel_month.lower()
         file_path = os.path.join(directory, f'../reports/figures/{short_month[:3]}_calendar.gif')
+        col1.write('')
         col1.write('')
         col1.image(file_path, use_column_width=True)
 

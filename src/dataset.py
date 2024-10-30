@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import streamlit as st
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 directory = os.path.dirname(os.path.abspath(__file__))
 
@@ -65,7 +65,7 @@ def calculate_id_date(select_date:str, type:str) -> int:
 
     return int(sel_id)
 
-@st.cache_data
+@st.cache_data(ttl=timedelta(hours=1))
 def load_GFS_analysis(select_date:str, place:str) -> object:
     id_place = dict_place[place]
 
@@ -80,7 +80,7 @@ def load_GFS_analysis(select_date:str, place:str) -> object:
 
     return url3, url2, url1
 
-@st.cache_data
+@st.cache_data(ttl=timedelta(hours=1))
 def load_GFS_anomaly(select_date:str, place:str) -> object:
     id_place = dict_place[place]
 
@@ -89,6 +89,7 @@ def load_GFS_anomaly(select_date:str, place:str) -> object:
 
     return url1
 
+@st.cache_data(ttl=timedelta(hours=1))
 def load_crop_calendar():
     file_path = os.path.join(directory, '../data/processed/crop_calendar.xlsx')
     data = pd.read_excel(file_path, sheet_name='Feuil1')

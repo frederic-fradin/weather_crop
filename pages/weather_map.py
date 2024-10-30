@@ -1,7 +1,11 @@
 import streamlit as st
 from datetime import datetime, timedelta
+import json
+import os
 
-from src import load_places, load_GFS_analysis, image_rectangle, crop_image, load_GFS_anomaly
+directory = os.path.dirname(os.path.abspath(__file__))
+
+from src import load_places, load_GFS_analysis, image_rectangle, crop_image, get_size
 
 today = datetime.today()
 last_week = today - timedelta(days=7)
@@ -52,26 +56,50 @@ with tab2:
                                  max_value=today)
     sel_date2 = col2a.date_input("End date", key='co2', value=today, format="YYYY-MM-DD",
                                  max_value=today)
-    col3.write('')
-    with col3.expander('Crop coordinates'):
-        top = st.number_input('Top corner', key='top', step=1, min_value=1, value=202)
-        left = st.number_input('Left corner', key='left', step=1, min_value=1, value=242)
-        bottom = st.number_input('Bottom corner', key='bottom', step=1, min_value=1, value=242)
-        right = st.number_input('Right corner', key='Right', step=1, min_value=1, value=312)
-        shape = st.selectbox('Shape', options=['rectangle', 'ellipse'], index=0)
+    
+    file_path = os.path.join(directory, '../data/processed/coord_dict.json')
+    try:
+        coord_dict = json.load(open(file_path))
+    except:
+        coord_dict = {}
 
     col3.write('')
+    with col3.expander('Crop coordinates'):
+        w, h = get_size(def_url)
+        params = st.selectbox(label='Favorites', options=coord_dict.keys(), index=None)
+        if params:
+            fav = coord_dict[params]
+            x1, x2 = fav[0][0], fav[0][1]
+            y1, y2 = fav[1][0], fav[1][1]
+        else:
+            x1, x2 = 0, w
+            y1, y2 = 0, h
+
+        x_values = st.slider("Select X range", 0, int(w), (x1, x2), step=2)
+        y_values = st.slider("Select Y range", 0, int(h), (y1, y2), step=2)
+        shape = st.selectbox('Shape', options=['rectangle', 'ellipse'], index=0)
+        name = st.text_input("Name", "default")
+        save = st.button(label="Save", use_container_width=True)
+
+        if save:
+            coord_dict[name] = [x_values, y_values]
+            json.dump(coord_dict, open(file_path, 'w'))
+
+    
+    col1a, col2a, col3a = col1.columns([4.8, 0.4, 4.8])
+    img1 = image_rectangle(url=def_url, left=int(x_values[0]), top=int(y_values[0]),
+                           right=int(x_values[1]), bottom=int(y_values[1]), forme=shape)
+    
+    col1a.write('')
+    col1a.image(img1)
     validate = col3.button('Show and crop', key='co5', use_container_width=True)
 
     if validate:
-        col1.write('')
-        col1a, col2a, col3a = col1.columns([6.75,0.5,2.75])
-        url1 = load_GFS_anomaly(select_date=str(sel_date1), place=sel_place)
-        img1 = image_rectangle(url=url1, left=left, top=top, right=right, bottom=bottom, forme=shape)
-        col1a.image(img1)
+        # url1 = load_GFS_anomaly(select_date=str(sel_date1), place=sel_place)
 
-        im_crop, color_ref = crop_image(url=def_url,
-                        left=left, top=top, right=right, bottom=bottom,
+        im_crop, image_dict, fig, fig2 = crop_image(url=def_url, left=int(x_values[0]), top=int(y_values[0]),
+                           right=int(x_values[1]), bottom=int(y_values[1]),
                         )
-        col3a.image(im_crop)
-        col3a.write(color_ref)
+        
+        col3a.plotly_chart(fig)
+        col1.plotly_chart(fig2)
