@@ -7,3 +7,7 @@ env/
 *.ipynb
 __pycache__/*.pyc
 __pycache__/*.poc
+src/__pycache__/__init__.cpython-312.pyc
+src/__pycache__/dataset.cpython-312.pyc
+src/__pycache__/image.cpython-312.pyc
+src/__pycache__/user.cpython-312.pyc
