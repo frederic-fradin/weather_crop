@@ -1,4 +1,6 @@
+import json
 import streamlit as st
+from streamlit_lottie import st_lottie
 from src import verify_password, load_user_data
 
 if "logged_in" not in st.session_state:
@@ -18,6 +20,23 @@ def login():
     user = st.sidebar.text_input('Username', type='default')
     pwd = st.sidebar.text_input('Password', type='password')
     connect = st.sidebar.button("Log in", use_container_width=True, type='primary')
+
+    def load_lottiefile(filepath:str):
+        with open(filepath, 'r') as f:
+            return json.load(f)
+
+    lottie_json = load_lottiefile('./data/raw/Animation5.json')
+    st_lottie(
+            lottie_json,
+            speed=0.5,
+            reverse=False,
+            loop=True,
+            quality='medium',
+            # height=1080,
+            width=640,
+            key=None
+        )
+
     if connect:
         if verify_password(user, pwd):
             user_data = load_user_data()
@@ -28,6 +47,8 @@ def login():
             st.rerun()
         else:
             st.sidebar.error("Login failed. Please check your username and password.")
+
+
 
 def logout():
     st.session_state.logged_in = False
