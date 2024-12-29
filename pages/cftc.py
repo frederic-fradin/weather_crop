@@ -1,3 +1,3 @@
 import streamlit as st
 
-st.header('CFTC Analysis')
+st.header("CFTC Analysis")

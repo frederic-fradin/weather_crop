@@ -1,9 +1,15 @@
 import streamlit as st
 
-st.set_page_config(page_title="MarketData", page_icon="🌤️", layout = 'wide', initial_sidebar_state="expanded")
+st.set_page_config(
+    page_title="MarketData",
+    page_icon="🌤️",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 
 # Adjust top padding
-st.markdown("""
+st.markdown(
+    """
             <style>
                     .block-container {
                         padding-top: 4rem;
@@ -12,10 +18,12 @@ st.markdown("""
                         padding-right: 5rem;
                     }
             </style>
-            """, unsafe_allow_html=True)
+            """,
+    unsafe_allow_html=True,
+)
 
 # Page header
 col1, col2, col3 = st.columns([0.55, 0.10, 0.35])
 col1.title("Analysis for Agricultural production")
-col3.image('./reports/figures/main_img.jpg')
-col1.write('Weather data from World Ag Weather (https://www.worldagweather.com/)')
+col3.image("./reports/figures/main_img.jpg")
+col1.write("Weather data from World Ag Weather (https://www.worldagweather.com/)")
